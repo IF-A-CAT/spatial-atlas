@@ -119,6 +119,67 @@ def fetch_arxiv(days: int, batch: int = 200) -> list:
     return out
 
 
+def load_summaries(path: str) -> dict:
+    """摘要缓存 {arxiv_id: {"summary": str, "model": str}}，跨运行复用。"""
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def llm_summarize_batch(papers: list, model: str, token: str) -> dict:
+    """调用 GitHub Models 为一批论文生成中文摘要。严格锚定摘要原文：
+    只总结问题/方法/结果，不得引入摘要之外的信息。返回 {id: {"summary","model"}}。"""
+    import os
+    token = token or os.environ.get("GITHUB_TOKEN", "")
+    if not token:
+        return {}
+    joined = "\n\n".join(
+        f"[{p['id']}] 标题: {p['title']}\n摘要: {p['abstract']}" for p in papers)
+    body = json.dumps({
+        "messages": [
+            {"role": "system", "content":
+                "你是学术论文摘要员。对给定的每篇 arXiv 论文，仅根据其摘要用中文写 2-3 句总结，"
+                "依次说明：解决什么问题、方法核心、主要结果或贡献。严禁添加摘要之外的信息、"
+                "不得评价或臆测。输出 JSON 对象，键为论文 id（如 2609.07497），值为总结字符串，"
+                "不要输出其他内容。"},
+            {"role": "user", "content": joined},
+        ],
+        "temperature": 0.2,
+    }).encode()
+    req = urllib.request.Request(
+        f"https://models.github.ai/inference/chat/completions", data=body,
+        headers={"Authorization": f"Bearer {token}",
+                 "Content-Type": "application/json",
+                 "User-Agent": "spatial-atlas-daily/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            resp = json.loads(r.read())
+        content = resp["choices"][0]["message"]["content"]
+        content = re.sub(r"^```(json)?|```$", "", content.strip(), flags=re.M).strip()
+        parsed = json.loads(content)
+        return {k: {"summary": clean(str(v)), "model": model}
+                for k, v in parsed.items() if isinstance(v, str) and v.strip()}
+    except Exception as e:
+        print(f"  LLM 摘要失败（回退为显示英文摘要）: {e}")
+        return {}
+
+
+def summarize_missing(papers: list, cache: dict, model: str, batch: int = 8) -> dict:
+    """为缓存中没有摘要的论文请求 LLM；含限速退避。"""
+    need = [p for p in papers if p["id"] not in cache]
+    for i in range(0, len(need), batch):
+        chunk = need[i:i + batch]
+        got = llm_summarize_batch(chunk, model, None)
+        cache.update(got)
+        print(f"  LLM 摘要 {min(i + batch, len(need))}/{len(need)}")
+        if not got:  # 连续失败则停止，避免刷爆限额
+            break
+        time.sleep(2)
+    return cache
+
+
 def fetch_hf_upvotes() -> dict:
     """HF Daily Papers 点赞数：{arxiv_id: upvotes}。失败返回空。"""
     try:
@@ -151,6 +212,10 @@ def main():
     ap.add_argument("--per-track", type=int, default=12, help="每方向保留篇数")
     ap.add_argument("--min-score", type=int, default=3, help="入选最低分")
     ap.add_argument("--out", default="daily.js")
+    ap.add_argument("--summaries", default="summaries.json", help="摘要缓存文件")
+    ap.add_argument("--llm", action="store_true",
+                    help="为缓存中缺失的论文调用 GitHub Models 生成摘要（CI 用）")
+    ap.add_argument("--model", default="openai/gpt-4.1-mini", help="GitHub Models 模型名")
     args = ap.parse_args()
 
     print(f"拉取 arXiv 近 {args.days} 天 cs.CV/cs.RO 论文 …")
@@ -161,13 +226,22 @@ def main():
         print(f"  HF Daily Papers 热度表: {len(upv)} 条")
 
     by_track = {tid: [] for tid, _, _ in TRACKS}
+    selected = []
     for p in papers:
         tid, s = score_paper(p)
         if tid is None or s < args.min_score:
             continue
         s += upv.get(p["id"], 0) / 10  # 热度加成：10 赞 ≈ 1 分
-        p2 = dict(p, track=tid, score=round(s, 2))
-        by_track[tid].append(p2)
+        selected.append(dict(p, track=tid, score=round(s, 2)))
+        by_track[tid].append(selected[-1])
+
+    # 中文摘要：优先用缓存；--llm 时为缺失项调用 GitHub Models（失败则无摘要，前端回退英文摘要）
+    cache = load_summaries(args.summaries)
+    if args.llm:
+        cache = summarize_missing(selected, cache, args.model)
+    for p in selected:
+        if p["id"] in cache:
+            p["summary"] = cache[p["id"]]["summary"]
 
     tracks_out = {}
     total = 0
@@ -179,7 +253,8 @@ def main():
             p.pop("track")
         tracks_out[tid] = {"name": name, "papers": lst}
         total += len(lst)
-        print(f"  [{tid}] {name}: {len(lst)} 篇")
+        n_sum = sum(1 for p in lst if "summary" in p)
+        print(f"  [{tid}] {name}: {len(lst)} 篇（含中文摘要 {n_sum}）")
 
     now = datetime.now(timezone.utc)
     daily = {
@@ -192,6 +267,8 @@ def main():
     }
     with open(args.out, "w", encoding="utf-8") as f:
         f.write("window.DAILY = " + json.dumps(daily, ensure_ascii=False) + ";\n")
+    with open(args.summaries, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False, indent=1)
     print(f"写入 {args.out}: 共 {total} 篇 · 数据日期 {daily['date_cn']}")
 
 

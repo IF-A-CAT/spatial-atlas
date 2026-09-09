@@ -25,8 +25,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Fetch and score latest arXiv papers
-        run: python3 tools/update_daily.py --days 3 --per-track 12
+      - name: Fetch, score and summarize latest arXiv papers
+        run: python3 tools/update_daily.py --days 3 --per-track 12 --llm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit and push if changed
         run: |

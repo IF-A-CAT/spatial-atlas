@@ -163,6 +163,9 @@ h2{font-family:'Newsreader','Noto Serif SC',serif;font-weight:500;font-size:30px
   font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);
   background:var(--accent-soft);border-radius:4px;padding:2px 9px;align-self:flex-start;
 }
+.dcard .abswrap{font-size:12px;color:var(--ink-3)}
+.dcard .abswrap summary{cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px}
+.dcard .abswrap .abs{display:block;-webkit-line-clamp:unset;margin-top:6px}
 
 /* ---------- lineage map ---------- */
 .map-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin-top:26px}
@@ -706,11 +709,16 @@ function renderDaily(){
     for (const p of (t.papers||[])){
       n++;
       const au = p.authors.slice(0,4).join(", ") + (p.authors.length > 4 ? " et al." : "");
+      const body = p.summary
+        ? `<p class="zh">${esc(p.summary)}</p>
+           <span class="comment">AI 摘要 · 依原文摘要生成</span>
+           <details class="abswrap"><summary>英文摘要</summary><p class="abs full">${esc(p.abstract)}</p></details>`
+        : `<p class="abs">${esc(p.abstract)}</p>`;
       html += `<article class="card dcard">
         <div class="row1"><span class="venue" style="color:${hex}">${TRACK_NAMES[tid]||tid}</span><span class="yr">${esc(p.published)}</span></div>
         <h3 class="serif"><a href="${p.url}" target="_blank" rel="noopener">${esc(p.title)}</a></h3>
         <p class="authors">${esc(au)} · arXiv ${esc(p.id)}</p>
-        <p class="abs">${esc(p.abstract)}</p>
+        ${body}
         ${p.comment ? `<span class="comment">arXiv 备注: ${esc(p.comment.slice(0,90))}</span>` : ""}
         <div class="links"><a href="${p.url}" target="_blank" rel="noopener">arXiv ${esc(p.id)}</a><a href="https://arxiv.org/pdf/${esc(p.id)}" target="_blank" rel="noopener">PDF ↗</a></div>
       </article>`;
