@@ -147,6 +147,23 @@ h2{font-family:'Newsreader','Noto Serif SC',serif;font-weight:500;font-size:30px
 .sec-intro{max-width:680px;color:var(--ink-2);margin:14px 0 0;font-size:14.5px}
 .sec-intro b{color:var(--ink);font-weight:600}
 
+/* ---------- daily track ---------- */
+.daily-head-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.daily-refresh{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);
+  border:1px solid var(--accent);border-radius:99px;padding:2px 13px;background:var(--panel);
+}
+.daily-sub{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-3)}
+.dcard .abs{
+  font-size:13px;color:var(--ink-2);margin:0;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.dcard .authors{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-3);line-height:1.5;margin:0}
+.dcard .comment{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);
+  background:var(--accent-soft);border-radius:4px;padding:2px 9px;align-self:flex-start;
+}
+
 /* ---------- lineage map ---------- */
 .map-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin-top:26px}
 .map-scroll svg{display:block;min-width:1120px;width:100%;height:auto}
@@ -240,6 +257,7 @@ footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
   <div class="topbar-in">
     <a class="brand" href="#top">空间智能<em>研究图谱</em></a>
     <nav class="topnav">
+      <a href="#daily">每日追踪</a>
       <a href="#lineage">谱系</a>
       <a href="#sec-slam">SLAM</a>
       <a href="#sec-rep">三维表示</a>
@@ -278,7 +296,7 @@ footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
   <p class="thesis">
     SLAM 把空间压缩为位姿与地图，3D 重建把照片变成几何，<strong>前馈几何模型</strong>（VGGT 一系）把这一过程变成一次前向推理，
     世界模型则更进一步——<strong>预测世界的下一个状态</strong>。四条线索正在汇合成同一个问题：如何让机器理解并想象三维世界。
-    本页只收录经得起检验的工作，并画出它们之间的谱系。
+    本页下半部是<b>人工核验的精选图谱</b>（40 篇，逐篇溯源），上方的<b>每日追踪</b>由 GitHub Actions 每日自动收录最新 arXiv 论文。
   </p>
   <div class="stats">
     <div class="stat"><b id="statTotal">–</b><span>篇收录论文</span></div>
@@ -286,6 +304,28 @@ footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
     <div class="stat"><b>4</b><span>研究方向</span></div>
     <div class="stat"><b>100%</b><span>经 arXiv / 官方页核验</span></div>
   </div>
+</section>
+
+<!-- ================= DAILY TRACK ================= -->
+<section id="daily">
+  <div class="sec-head">
+    <p class="sec-kicker">Daily Track</p>
+    <h2>每日追踪 · 最新论文动态</h2>
+  </div>
+  <p class="sec-intro">
+    GitHub Actions 每日两次（北京 09:23 / 21:23）从 <b>arXiv API</b> 拉取 cs.CV / cs.RO 最新提交，
+    按四个方向的关键词相关性排序收录。<b>所有条目直接来自 arXiv 元数据，无任何人工或模型生成内容</b>；
+    论文为预印本、未经同行评审，点击标题即可到 arXiv 溯源核实。
+  </p>
+  <div class="daily-head-row">
+    <span class="daily-refresh" id="dailyDate">数据加载中…</span>
+    <span class="daily-sub" id="dailyMeta"></span>
+  </div>
+  <div class="cards" id="dailyCards"></div>
+  <p class="empty" id="dailyEmpty" style="display:none">
+    尚无每日数据 — 推送到 GitHub 后 Actions 会自动生成 daily.js；
+    本地也可运行 <span class="mono">python3 tools/update_daily.py</span> 手动生成。
+  </p>
 </section>
 
 <!-- ================= LINEAGE MAP ================= -->
@@ -361,7 +401,7 @@ footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
     <div class="crit"><h3>课题组门槛</h3><p>第一作者单位限定为该方向公认的领先实验室：HKU MARS、ETH、Oxford VGG、TUM、Imperial、Inria、Princeton、UC Berkeley、ZJU、Shanghai AI Lab，以及 DeepMind、Meta FAIR、OpenAI、NVIDIA、Wayve 等。</p></div>
     <div class="crit"><h3>真实性核验</h3><p>每篇论文的标题、作者、arXiv 编号、venue 均逐一对照 arXiv 摘要页、官方项目主页或 venue 官网核验；无法确认 venue 的只标注 arXiv 编号，绝不臆测。</p></div>
   </div>
-  <p class="verify-line">核验日期 2026-09-09 · 数据维护于 index.html 内 PAPERS 数组 · 发现错误欢迎提 issue</p>
+  <p class="verify-line">精选图谱核验日期 2026-09-09 · 数据维护于 index.html 内 PAPERS 数组 · 每日追踪由 GitHub Actions 直接写入 arXiv 元数据（tools/update_daily.py）· 发现错误欢迎提 issue</p>
 </section>
 
 </main>
@@ -374,6 +414,7 @@ footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
   </div>
 </footer>
 
+<script src="daily.js"></script>
 <script>
 /* =====================================================================
    PAPERS — 每篇论文一个对象。维护方式：按同样字段增删，页面自动渲染。
@@ -647,6 +688,38 @@ function renderLineage(){
   svg.innerHTML = parts.join("");
 }
 
+/* --- daily track --- */
+const TRACK_NAMES = {slam:"SLAM", rep:"三维表示", ff:"前馈几何", wm:"世界模型"};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function renderDaily(){
+  const d = window.DAILY;
+  if (!d || !d.tracks){
+    $("#dailyDate").textContent = "数据未生成";
+    $("#dailyEmpty").style.display = "block";
+    return;
+  }
+  $("#dailyDate").textContent = `数据日期 ${d.date_cn}（北京时间）`;
+  $("#dailyMeta").textContent = `更新于 ${d.generated_utc.replace("T"," ").replace("Z"," UTC")} · 回溯 ${d.window_days} 天 · ${d.source}`;
+  let html = "", n = 0;
+  for (const [tid, t] of Object.entries(d.tracks)){
+    const hex = catHex(tid);
+    for (const p of (t.papers||[])){
+      n++;
+      const au = p.authors.slice(0,4).join(", ") + (p.authors.length > 4 ? " et al." : "");
+      html += `<article class="card dcard">
+        <div class="row1"><span class="venue" style="color:${hex}">${TRACK_NAMES[tid]||tid}</span><span class="yr">${esc(p.published)}</span></div>
+        <h3 class="serif"><a href="${p.url}" target="_blank" rel="noopener">${esc(p.title)}</a></h3>
+        <p class="authors">${esc(au)} · arXiv ${esc(p.id)}</p>
+        <p class="abs">${esc(p.abstract)}</p>
+        ${p.comment ? `<span class="comment">arXiv 备注: ${esc(p.comment.slice(0,90))}</span>` : ""}
+        <div class="links"><a href="${p.url}" target="_blank" rel="noopener">arXiv ${esc(p.id)}</a><a href="https://arxiv.org/pdf/${esc(p.id)}" target="_blank" rel="noopener">PDF ↗</a></div>
+      </article>`;
+    }
+  }
+  $("#dailyCards").innerHTML = html;
+  $("#dailyEmpty").style.display = n ? "none" : "block";
+}
+
 /* --- filtering --- */
 let curCat = "all";
 function applyFilter(){
@@ -693,6 +766,7 @@ btn.addEventListener("click", () => {
 $("#statTotal").textContent = PAPERS.length;
 renderSections();
 renderLineage();
+renderDaily();
 applyFilter();
 matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", renderLineage);
 </script>

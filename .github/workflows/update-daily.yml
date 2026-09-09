@@ -1,0 +1,41 @@
+name: daily-papers
+
+# 每日两次拉取 arXiv 并重建 daily.js，提交后 GitHub Pages（Deploy from branch）自动重部署。
+# UTC 01:23 ≈ 北京 09:23（覆盖 arXiv 当日新提交），UTC 13:23 ≈ 北京 21:23（补收下午提交 + HF 热度）。
+on:
+  schedule:
+    - cron: "23 1 * * *"
+    - cron: "23 13 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-papers
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch and score latest arXiv papers
+        run: python3 tools/update_daily.py --days 3 --per-track 12
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daily.js
+          if git diff --cached --quiet; then
+            echo "No changes — nothing to commit."
+          else
+            git commit -m "chore(daily): 更新每日论文追踪 $(date -u +%F)"
+            git push
+          fi
