@@ -1,0 +1,41 @@
+name: deploy-pages
+
+# push 到 main（含 daily-papers 机器人的提交）即自动部署静态站点到 GitHub Pages。
+# 首次运行时 configure-pages 的 enablement 会用内置 GITHUB_TOKEN 自动开通 Pages，
+# 无需手动到 Settings → Pages 里切换。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect site files
+        run: mkdir -p _site && cp index.html daily.js .nojekyll _site/
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
