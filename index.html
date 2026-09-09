@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>空间智能研究图谱</title>
+<meta name="description" content="SLAM · 3D 重建 · VGGT 前馈几何 · 世界模型 — 四个方向高影响力论文的精选图谱与谱系联系，每篇均经 arXiv 与官方页面核验。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F2F3EE'/%3E%3Cpath d='M6 24 L16 8 L26 24 Z' fill='none' stroke='%23BC5218' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='19' r='2.4' fill='%2320261F'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* ---------- tokens: light palette on bare :root ---------- */
+:root{
+  --bg:#F2F3EE;
+  --panel:#FAFAF6;
+  --panel-2:#F6F7F1;
+  --ink:#212622;
+  --ink-2:#5C645B;
+  --ink-3:#8A9188;
+  --line:#D9DBCF;
+  --line-soft:#E7E8DE;
+  --accent:#BC5218;
+  --accent-soft:#F3E2D5;
+  --c-slam:#2A7F6F;
+  --c-rep:#6754BC;
+  --c-ff:#BC5218;
+  --c-wm:#B23A78;
+  --shadow:0 1px 2px rgba(33,38,34,.06),0 8px 24px rgba(33,38,34,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181A;
+    --panel:#1C2023;
+    --panel-2:#191D20;
+    --ink:#E4E7E0;
+    --ink-2:#9CA49A;
+    --ink-3:#6E766D;
+    --line:#2E3437;
+    --line-soft:#23282B;
+    --accent:#E8823E;
+    --accent-soft:#3A2A1C;
+    --c-slam:#4FBFA8;
+    --c-rep:#A48FF0;
+    --c-ff:#E8823E;
+    --c-wm:#E77BB4;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181A;
+  --panel:#1C2023;
+  --panel-2:#191D20;
+  --ink:#E4E7E0;
+  --ink-2:#9CA49A;
+  --ink-3:#6E766D;
+  --line:#2E3437;
+  --line-soft:#23282B;
+  --accent:#E8823E;
+  --accent-soft:#3A2A1C;
+  --c-slam:#4FBFA8;
+  --c-rep:#A48FF0;
+  --c-ff:#E8823E;
+  --c-wm:#E77BB4;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+}
+
+/* ---------- base ---------- */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  color:var(--ink);
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size:32px 32px;
+  font-family:'IBM Plex Sans','Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:15px;
+  line-height:1.75;
+}
+main{max-width:1080px;margin:0 auto;padding:0 24px}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+::selection{background:var(--accent-soft)}
+
+.serif{font-family:'Newsreader','Noto Serif SC','Songti SC',serif}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-in{
+  max-width:1080px;margin:0 auto;padding:10px 24px;
+  display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;
+}
+.brand{font-family:'Newsreader','Noto Serif SC',serif;font-weight:600;font-size:17px;color:var(--ink);text-decoration:none;letter-spacing:.01em}
+.brand em{font-style:italic;color:var(--accent);font-weight:500}
+.topnav{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.topnav a{
+  color:var(--ink-2);text-decoration:none;font-size:13px;padding:3px 9px;border-radius:99px;
+}
+.topnav a:hover{color:var(--ink);background:var(--panel-2)}
+#themeBtn{
+  border:1px solid var(--line);background:var(--panel);color:var(--ink-2);
+  border-radius:99px;padding:2px 10px;font-size:12px;cursor:pointer;font-family:inherit;
+}
+#themeBtn:hover{color:var(--ink);border-color:var(--accent)}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 40px;position:relative}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.22em;
+  color:var(--accent);text-transform:uppercase;margin:0 0 14px;
+}
+h1{
+  font-family:'Newsreader','Noto Serif SC',serif;font-weight:500;
+  font-size:clamp(34px,5.4vw,52px);line-height:1.16;margin:0 0 18px;
+  letter-spacing:.005em;text-wrap:balance;
+}
+h1 .thin{font-style:italic;font-weight:400;color:var(--ink-2)}
+.thesis{max-width:640px;color:var(--ink-2);font-size:15.5px;margin:0 0 30px}
+.thesis strong{color:var(--ink);font-weight:600}
+.stats{display:flex;gap:0;flex-wrap:wrap;border:1px solid var(--line);background:var(--panel);border-radius:6px;overflow:hidden;max-width:640px}
+.stat{flex:1 1 130px;padding:12px 18px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat b{display:block;font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:500;color:var(--ink);line-height:1.3}
+.stat span{font-size:12px;color:var(--ink-2)}
+.hero-frusta{position:absolute;right:-10px;top:44px;width:min(320px,32vw);opacity:.9;pointer-events:none}
+@media (max-width:860px){.hero-frusta{display:none}}
+
+/* ---------- section frame ---------- */
+section{padding:52px 0 8px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+.sec-kicker{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-3);
+}
+.sec-kicker::before{content:"";display:inline-block;width:22px;height:1px;background:var(--accent);vertical-align:middle;margin-right:10px}
+h2{font-family:'Newsreader','Noto Serif SC',serif;font-weight:500;font-size:30px;line-height:1.25;margin:0;text-wrap:balance}
+.sec-intro{max-width:680px;color:var(--ink-2);margin:14px 0 0;font-size:14.5px}
+.sec-intro b{color:var(--ink);font-weight:600}
+
+/* ---------- lineage map ---------- */
+.map-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin-top:26px}
+.map-scroll svg{display:block;min-width:1120px;width:100%;height:auto}
+.map-note{font-size:12.5px;color:var(--ink-3);margin-top:10px;font-family:'IBM Plex Mono',monospace}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin:30px 0 4px;padding:12px;border:1px solid var(--line);border-radius:8px;
+  background:var(--panel);
+}
+.chip{
+  border:1px solid var(--line);background:var(--panel-2);color:var(--ink-2);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;padding:4px 13px;border-radius:99px;cursor:pointer;
+}
+.chip:hover{color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+#q{
+  flex:1 1 180px;min-width:150px;border:1px solid var(--line);background:var(--bg);
+  color:var(--ink);font-family:inherit;font-size:13px;padding:6px 12px;border-radius:6px;
+}
+#count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-3);margin-left:auto}
+
+/* ---------- paper sections ---------- */
+.paper-sec{scroll-margin-top:70px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:22px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:18px 20px 14px;display:flex;flex-direction:column;gap:9px;
+  box-shadow:var(--shadow);
+}
+.card .row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.venue{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;
+  padding:1.5px 9px;border-radius:99px;border:1px solid currentColor;line-height:1.6;
+}
+.card .yr{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-3);margin-left:auto}
+.card h3{
+  font-family:'Newsreader','Noto Serif SC',serif;font-weight:500;font-size:18.5px;
+  line-height:1.32;margin:0;text-wrap:balance;
+}
+.card h3 a{color:var(--ink);text-decoration:none}
+.card h3 a:hover{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.group{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-2);line-height:1.5}
+.zh{font-size:13.5px;color:var(--ink-2);margin:0}
+.impact{font-size:13px;margin:0;color:var(--ink)}
+.impact::before{content:"▸ ";color:var(--accent)}
+.links{display:flex;gap:14px;margin-top:auto;padding-top:8px;border-top:1px dashed var(--line)}
+.links a{font-family:'IBM Plex Mono',monospace;font-size:12px;text-decoration:none}
+.links a:hover{text-decoration:underline}
+.empty{display:none;padding:36px 0;text-align:center;color:var(--ink-3);font-size:14px}
+
+/* ---------- bridges ---------- */
+.bridges{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:22px}
+.bridge{
+  border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:6px;
+  background:var(--panel-2);padding:16px 18px;
+}
+.bridge h3{font-family:'Newsreader','Noto Serif SC',serif;font-size:18px;font-weight:600;margin:0 0 8px}
+.flow{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);line-height:2;margin:0 0 8px;word-break:break-word}
+.flow i{font-style:normal;color:var(--accent);padding:0 2px}
+.bridge p{margin:0;font-size:13.5px;color:var(--ink-2)}
+
+/* ---------- criteria ---------- */
+.criteria{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:22px}
+.crit{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.crit h3{font-size:14.5px;font-weight:600;margin:0 0 6px;color:var(--ink)}
+.crit p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.verify-line{
+  margin-top:22px;padding:12px 16px;border:1px dashed var(--line);border-radius:6px;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-2);background:var(--panel-2);
+}
+
+/* ---------- footer ---------- */
+footer{margin-top:70px;border-top:1px solid var(--line);padding:26px 0 46px}
+.foot-in{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;color:var(--ink-3);font-size:12.5px}
+.foot-in .mono{font-size:11.5px}
+.foot-in a{color:var(--ink-2)}
+
+@media (max-width:640px){
+  .hero{padding-top:44px}
+  .stats{max-width:none}
+  .stat b{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top">空间智能<em>研究图谱</em></a>
+    <nav class="topnav">
+      <a href="#lineage">谱系</a>
+      <a href="#sec-slam">SLAM</a>
+      <a href="#sec-rep">三维表示</a>
+      <a href="#sec-ff">前馈几何</a>
+      <a href="#sec-wm">世界模型</a>
+      <a href="#bridges">交叉联系</a>
+      <a href="#criteria">收录标准</a>
+    </nav>
+    <button id="themeBtn" type="button" aria-label="切换明暗主题">◐ 主题</button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero" style="padding-top:64px">
+  <svg class="hero-frusta" viewBox="0 0 320 200" fill="none" aria-hidden="true">
+    <path d="M0 40 H320 M0 84 H320 M0 128 H320 M0 172 H320" stroke="var(--line-soft)" stroke-width="1"/>
+    <path d="M60 0 V200 M140 0 V200 M220 0 V200 M300 0 V200" stroke="var(--line-soft)" stroke-width="1"/>
+    <path d="M18 150 C 70 96, 120 130, 150 84 S 236 40, 292 52" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="5 5"/>
+    <g stroke="var(--ink-2)" stroke-width="1.4">
+      <path d="M18 150 l16 -11 l-5 17 z" fill="var(--bg)"/>
+      <path d="M78 112 l16 -11 l-5 17 z" fill="var(--bg)"/>
+      <path d="M148 84 l16 -11 l-5 17 z" fill="var(--bg)"/>
+      <path d="M212 46 l16 -11 l-5 17 z" fill="var(--bg)"/>
+      <path d="M284 44 l16 -11 l-5 17 z" fill="var(--c-wm)"/>
+    </g>
+    <circle cx="18" cy="150" r="3" fill="var(--accent)"/>
+    <circle cx="150" cy="84" r="3" fill="var(--accent)"/>
+    <circle cx="292" cy="52" r="3" fill="var(--accent)"/>
+    <text x="24" y="172" font-family="IBM Plex Mono" font-size="9" fill="var(--ink-3)">x₀ → x₁ → … → xₙ</text>
+  </svg>
+
+  <p class="eyebrow">SLAM · 3D RECONSTRUCTION · FEED-FORWARD GEOMETRY · WORLD MODELS</p>
+  <h1>从几何到世界模型<span class="thin">，四十篇关键论文</span></h1>
+  <p class="thesis">
+    SLAM 把空间压缩为位姿与地图，3D 重建把照片变成几何，<strong>前馈几何模型</strong>（VGGT 一系）把这一过程变成一次前向推理，
+    世界模型则更进一步——<strong>预测世界的下一个状态</strong>。四条线索正在汇合成同一个问题：如何让机器理解并想象三维世界。
+    本页只收录经得起检验的工作，并画出它们之间的谱系。
+  </p>
+  <div class="stats">
+    <div class="stat"><b id="statTotal">–</b><span>篇收录论文</span></div>
+    <div class="stat"><b>2018–26</b><span>时间跨度</span></div>
+    <div class="stat"><b>4</b><span>研究方向</span></div>
+    <div class="stat"><b>100%</b><span>经 arXiv / 官方页核验</span></div>
+  </div>
+</section>
+
+<!-- ================= LINEAGE MAP ================= -->
+<section id="lineage">
+  <div class="sec-head">
+    <p class="sec-kicker">Lineage</p>
+    <h2>谱系总览 · 2018 – 2026</h2>
+  </div>
+  <p class="sec-intro">
+    横轴为年份，四条泳道自上而下：SLAM / 三维表示 / 前馈几何 / 世界模型。
+    跨泳道的连线标注了方向之间的关键"输血"：<b>重建先验驱动 SLAM</b>、<b>高斯即地图</b>、<b>几何先验 ⇄ 生成先验</b>。
+  </p>
+  <div class="map-scroll">
+    <svg id="lineageSvg" viewBox="0 0 1120 470" role="img" aria-label="四个研究方向 2018 到 2026 年的论文谱系图"></svg>
+  </div>
+  <p class="map-note">— 实线：直接延伸/后续工作　虚线：思想或技术影响　节点颜色 = 所属方向　◆ 金色描边 = 该方向转折点</p>
+</section>
+
+<!-- ================= TOOLBAR ================= -->
+<div class="toolbar" id="toolbar">
+  <button class="chip on" data-cat="all">全部</button>
+  <button class="chip" data-cat="slam"><span class="dot" style="background:var(--c-slam)"></span>SLAM</button>
+  <button class="chip" data-cat="rep"><span class="dot" style="background:var(--c-rep)"></span>三维表示</button>
+  <button class="chip" data-cat="ff"><span class="dot" style="background:var(--c-ff)"></span>前馈几何</button>
+  <button class="chip" data-cat="wm"><span class="dot" style="background:var(--c-wm)"></span>世界模型</button>
+  <input id="q" type="search" placeholder="搜索标题 / 课题组 / 关键词…" aria-label="搜索论文">
+  <span id="count"></span>
+</div>
+
+<!-- ================= PAPER SECTIONS (rendered by JS) ================= -->
+<div id="sections"></div>
+<p class="empty" id="emptyMsg">没有匹配的论文 — 换个关键词，或点击上方分类。</p>
+
+<!-- ================= BRIDGES ================= -->
+<section id="bridges">
+  <div class="sec-head">
+    <p class="sec-kicker">Connections</p>
+    <h2>交叉联系 · 四条汇流线</h2>
+  </div>
+  <p class="sec-intro">方向之间的联系比方向本身更值得看——过去两年的多数突破发生在这些交界处。</p>
+  <div class="bridges">
+    <div class="bridge">
+      <h3>① 重建先验进入 SLAM</h3>
+      <p class="flow">DUSt3R <i>→</i> MASt3R <i>→</i> MASt3R-SLAM / CUT3R</p>
+      <p>几何基础模型的两视图重建先验，替代了手工特征、标定与人工调参：MASt3R-SLAM 证明"基础模型先验 + 轻量对齐"即可构成免标定、可回环的实时稠密 SLAM。这是 2024–2025 年 SLAM 最重要的范式转移。</p>
+    </div>
+    <div class="bridge">
+      <h3>② 显式表示回灌 SLAM</h3>
+      <p class="flow">3DGS <i>→</i> SplaTAM / MonoGS / Point-SLAM</p>
+      <p>高斯原语成为地图本身，可微光栅化成为跟踪的损失函数——从 NICE-SLAM 的神经隐式网格到"高斯即地图"，稠密 SLAM 的表示之争由 3DGS 接棒，渲染质量与几何精度同时提升。</p>
+    </div>
+    <div class="bridge">
+      <h3>③ 几何先验 ⇄ 生成先验</h3>
+      <p class="flow">VGGT / π³ / MapAnything <i>⇄</i> Cosmos / Genie 3</p>
+      <p>世界模型要输出 3D 一致的视频，前馈几何模型要扩展到生成式的开放世界——两条路线正在"物理 AI"上汇合：一边为另一边提供几何监督与评测底座，另一边提供想象与补全的先验。</p>
+    </div>
+    <div class="bridge">
+      <h3>④ 从想象中学习，到现实里执行</h3>
+      <p class="flow">World Models <i>→</i> DreamerV3 <i>→</i> DayDreamer <i>→</i> NWM / V-JEPA 2-AC</p>
+      <p>"在学到的世界模型里训练与规划，在真实世界执行"：从 2018 年的"梦境训练"构想到四足机器人 1 小时学会走路（DayDreamer），再到视频世界模型里的零样本导航规划（NWM）——这条线已走完闭环。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CRITERIA ================= -->
+<section id="criteria">
+  <div class="sec-head">
+    <p class="sec-kicker">Criteria</p>
+    <h2>收录标准与核验方法</h2>
+  </div>
+  <div class="criteria">
+    <div class="crit"><h3>影响力门槛</h3><p>仅收录顶级 venue（CVPR / ICCV / ECCV / NeurIPS / ICML / ICLR / SIGGRAPH / TRO / ICRA / RSS / TPAMI / Nature）或公认的标杆课题组工作，不收录仅因热度上榜的论文。</p></div>
+    <div class="crit"><h3>课题组门槛</h3><p>第一作者单位限定为该方向公认的领先实验室：HKU MARS、ETH、Oxford VGG、TUM、Imperial、Inria、Princeton、UC Berkeley、ZJU、Shanghai AI Lab，以及 DeepMind、Meta FAIR、OpenAI、NVIDIA、Wayve 等。</p></div>
+    <div class="crit"><h3>真实性核验</h3><p>每篇论文的标题、作者、arXiv 编号、venue 均逐一对照 arXiv 摘要页、官方项目主页或 venue 官网核验；无法确认 venue 的只标注 arXiv 编号，绝不臆测。</p></div>
+  </div>
+  <p class="verify-line">核验日期 2026-09-09 · 数据维护于 index.html 内 PAPERS 数组 · 发现错误欢迎提 issue</p>
+</section>
+
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span class="serif" style="font-size:15px;color:var(--ink-2)">空间智能研究图谱</span>
+    <span class="mono">SLAM · 3D · VGGT · WORLD MODELS</span>
+    <span style="margin-left:auto" class="mono">Hosted on GitHub Pages · <a href="https://github.com/IF-A-CAT/spatial-atlas" target="_blank" rel="noopener">源码仓库</a></span>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   PAPERS — 每篇论文一个对象。维护方式：按同样字段增删，页面自动渲染。
+   字段: id, cat(slam|rep|ff|wm), title, arxiv(编号或null), year, group,
+         venue, zh(一句核心贡献), impact(一句为什么重要), proj(项目页或null)
+   ===================================================================== */
+const CATS = {
+  slam: { name:"SLAM 与状态估计", hue:"var(--c-slam)", hex:"#2A7F6F", hexDark:"#4FBFA8",
+    intro:`视觉/惯性/LiDAR SLAM 的三条脉络在此交汇：<b>经典优化框架</b>（ORB-SLAM3、TRO 系列）、<b>紧耦合多传感器融合</b>（HKU MARS 的 FAST-LIO2 → R3LIVE → FAST-LIVO2 一线）与<b>学习型稠密 SLAM</b>（DROID-SLAM 及其后的神经隐式 / 高斯地图表示）。最新一章由基础模型先验（MASt3R-SLAM）写下。` },
+  rep: { name:"三维表示", hue:"var(--c-rep)", hex:"#6754BC", hexDark:"#A48FF0",
+    intro:`表示之争是整个领域的底层叙事：NeRF 的<b>隐式神经场</b>统治了 2020–2022，Instant-NGP 把训练压到秒级，随后 3D Gaussian Splatting 用<b>显式高斯原语</b>反转战局并成为当下主流；2DGS 与 SuGaR 则补齐了表面几何这一短板。` },
+  ff: { name:"前馈几何（VGGT 一系）", hue:"var(--c-ff)", hex:"#BC5218", hexDark:"#E8823E",
+    intro:`范式从"逐场景优化"转向"一次前向推理"：DUSt3R 把 3D 重建变成点图回归，MASt3R 补上匹配，Spann3R / CUT3R 引入空间记忆与流式状态，VGGT 以大规模几何 Transformer 登顶 CVPR 2025 最佳论文，π³、MapAnything、FastVGGT 则继续推向无偏、度量尺度与高效率。` },
+  wm: { name:"世界模型", hue:"var(--c-wm)", hex:"#B23A78", hexDark:"#E77BB4",
+    intro:`从 Ha & Schmidhuber 的"梦境训练"奠基，到 DreamerV3 登上 Nature，再到"视频生成即世界模拟"（Sora）与可交互基座环境（Genie 系列），世界模型正沿着<b>强化学习</b>、<b>视频生成</b>与<b>表征预测</b>（JEPA）三条路径逼近同一个目标：可想象、可规划、可交互的物理世界。` }
+};
+
+const PAPERS = [
+  /* ---------- SLAM ---------- */
+  {id:"orbslam3", cat:"slam", title:"ORB-SLAM3: An Accurate Open-Source Library for Visual, Visual-Inertial and Multi-Map SLAM", arxiv:"2007.11898", year:2021, group:"Universidad de Zaragoza · UZ-SLAMLab", venue:"TRO 2021",
+   zh:"支持单目/双目/RGB-D 与视觉惯性的 ORB 特征 SLAM 开源库，配合 Atlas 多地图机制，精度显著超越前代。",
+   impact:"视觉(惯性) SLAM 最经典的学术开源基线之一，几乎所有 VI-SLAM 工作都以它为对比标尺。", proj:"https://github.com/UZ-SLAMLab/ORB_SLAM3"},
+  {id:"droid", cat:"slam", title:"DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras", arxiv:"2108.10869", year:2021, group:"Princeton University · Vision & Learning Lab", venue:"NeurIPS 2021",
+   zh:"循环迭代更新 + 可微密集 Bundle Adjustment 层的深度学习 SLAM，灾难性失败率远低于经典方法。",
+   impact:"学习类 SLAM 的里程碑，其可微 BA 层被 DPVO、DPV-SLAM 等大量后续工作复用。", proj:"https://github.com/princeton-vl/DROID-SLAM"},
+  {id:"fastlio2", cat:"slam", title:"FAST-LIO2: Fast Direct LiDAR-inertial Odometry", arxiv:"2107.06829", year:2022, group:"HKU MARS Lab", venue:"TRO 2022",
+   zh:"免特征提取的直接法紧耦合 LiDAR-惯性里程计，配合自研增量 kd 树（ikd-Tree）实现低算力实时建图。",
+   impact:"LiDAR-inertial 里程计的事实标准基线，开源代码在学术与 Livox 固态雷达生态中被大规模复用。", proj:"https://github.com/hku-mars/FAST_LIO"},
+  {id:"lvisam", cat:"slam", title:"LVI-SAM: Tightly-coupled Lidar-Visual-Inertial Odometry via Smoothing and Mapping", arxiv:"2104.10831", year:2021, group:"Stevens Institute of Technology + MIT CSAIL", venue:"ICRA 2021",
+   zh:"基于 iSAM2 因子图的 LiDAR-视觉-惯性紧耦合框架，VIO 与 LIO 两子系统互相提供初始化与退化检测。",
+   impact:"LVI 紧耦合融合的经典开源基线，是 R3LIVE、FAST-LIVO2 等的常用对比对象。", proj:"https://github.com/TixiaoShan/LVI-SAM"},
+  {id:"r3live", cat:"slam", title:"R3LIVE: A Robust, Real-time, RGB-colored, LiDAR-Inertial-Visual tightly-coupled State Estimation and Mapping Package", arxiv:"2109.07982", year:2022, group:"HKU MARS Lab", venue:"ICRA 2022",
+   zh:"LIO 与 VIO 双子系统并行紧耦合，仅用 CPU 即可实时重建带 RGB 颜色的高保真点云地图。",
+   impact:"彩色实时重建效果出圈，成为 LiDAR-Inertial-Visual 融合方向最常引用的开源系统之一。", proj:"https://github.com/hku-mars/R3LIVE"},
+  {id:"fastlivo2", cat:"slam", title:"FAST-LIVO2: Fast, Direct LiDAR-Inertial-Visual Odometry", arxiv:"2408.14035", year:2024, group:"HKU MARS Lab", venue:"TRO 2024",
+   zh:"误差状态 IEKF 框架下的 LiDAR 辅助直接法视觉里程计，在统一体素地图中融合 LiDAR/惯性/视觉测量。",
+   impact:"当前 LIV 紧耦合方向精度与工程性最强的开源方案之一，已是该方向的最新对比基线。", proj:"https://github.com/hku-mars/FAST-LIVO2"},
+  {id:"nice", cat:"slam", title:"NICE-SLAM: Neural Implicit Scalable Encoding for SLAM", arxiv:"2112.12130", year:2022, group:"Zhejiang University + ETH Zurich", venue:"CVPR 2022",
+   zh:"多层级特征网格 + 神经隐式表示的可扩展稠密 RGB-D SLAM，追踪与建图均通过可微渲染优化。",
+   impact:"掀起神经隐式 SLAM 研究热潮，是此后大量隐式 SLAM 工作的标准对比基线。", proj:"https://pengsongyou.github.io/neslam"},
+  {id:"pslam", cat:"slam", title:"Point-SLAM: Dense Neural Point Cloud-based SLAM", arxiv:"2304.04278", year:2023, group:"ETH Zurich · Computer Vision Lab", venue:"ICCV 2023",
+   zh:"以自适应稀疏神经点云替代规则特征网格，保真度相当但模型更紧凑、速度约快一倍。",
+   impact:"确立从网格特征到点式表示的演进路线，是 3DGS SLAM 兴起前的重要参照。", proj:"https://github.com/Tangert/Point-SLAM"},
+  {id:"goslam", cat:"slam", title:"GO-SLAM: Global Optimization for Consistent 3D Instant Reconstruction", arxiv:"2309.02436", year:2023, group:"Zhejiang University + University of Bologna", venue:"ICCV 2023",
+   zh:"在全局优化框架下做学习型稠密 SLAM，持续对所有历史位姿与重建整体优化以消除漂移与尺度歧义。",
+   impact:"全局一致性稠密 SLAM 的代表作，与 DROID-SLAM 等共同构成学习型稠密 SLAM 基线。", proj:"https://youmi-zym.github.io/projects/GO-SLAM/"},
+  {id:"splatam", cat:"slam", title:"SplaTAM: Splat, Track & Map 3D Gaussians for Dense RGB-D SLAM", arxiv:"2312.02126", year:2024, group:"Carnegie Mellon University + MIT", venue:"CVPR 2024",
+   zh:"以各向同性 3D 高斯为地图原语，通过可微光栅化实现高保真稠密 RGB-D SLAM 的跟踪与重建。",
+   impact:"3DGS SLAM 热潮的开创性工作之一，确立“高斯即地图”范式。", proj:"https://spla-tam.github.io/"},
+  {id:"monogs", cat:"slam", title:"Gaussian Splatting SLAM", arxiv:"2312.06741", year:2024, group:"Imperial College London · Andrew Davison Group", venue:"CVPR 2024 Highlight",
+   zh:"首个支持单目相机的实时 3DGS SLAM，关键帧驱动的高斯地图 + 光度/深度可微跟踪。",
+   impact:"把 3DGS SLAM 从 RGB-D 推进到单目，是该方向引用最多的工作之一。", proj:"https://github.com/muskie82/MonoGS"},
+  {id:"mast3rslam", cat:"slam", title:"MASt3R-SLAM: Real-Time Dense SLAM with 3D Reconstruction Priors", arxiv:"2412.12392", year:2024, group:"Imperial College London · Dyson Robotics Lab", venue:"CVPR 2025 Highlight",
+   zh:"以 MASt3R 两视图重建先验为底座，闭环式点图对齐实现免标定、可回环的实时单目稠密 SLAM。",
+   impact:"证明基础重建先验可以即插即用驱动实时 SLAM，重新定义稠密 SLAM 技术路线。", proj:"https://edexheim.github.io/mast3r-slam/"},
+
+  /* ---------- 三维表示 ---------- */
+  {id:"nerf", cat:"rep", title:"NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis", arxiv:"2003.08934", year:2020, group:"UC Berkeley + Google Research", venue:"ECCV 2020 Oral",
+   zh:"用 MLP 隐式表示场景的体密度与颜色，通过体渲染从稀疏视角照片合成新视角。",
+   impact:"开创神经辐射场范式，掀起隐式 3D 表示与新视角合成的整个研究浪潮。", proj:"https://tancik.com/nerf"},
+  {id:"ingp", cat:"rep", title:"Instant Neural Graphics Primitives with a Multiresolution Hash Encoding", arxiv:"2201.05989", year:2022, group:"NVIDIA", venue:"SIGGRAPH 2022 (ACM TOG)",
+   zh:"多分辨率哈希编码 + 全融合 CUDA 训练，把 NeRF 式神经场训练压缩到秒级。",
+   impact:"神经场训练从小时级降到秒级，成为后续所有实时神经/高斯渲染的效率基石。", proj:null},
+  {id:"g3d", cat:"rep", title:"3D Gaussian Splatting for Real-Time Radiance Field Rendering", arxiv:"2308.04079", year:2023, group:"Inria · GRAPHDECO", venue:"SIGGRAPH 2023 (ACM TOG)",
+   zh:"可优化的各向异性 3D 高斯 + 可微光栅化 splatting 替代神经场，实现 1080p 实时渲染。",
+   impact:"以显式高斯原语取代隐式网络，成为当下 3D 重建/渲染领域事实上的主流表示。", proj:"https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/"},
+  {id:"sugar", cat:"rep", title:"SuGaR: Surface-Aligned Gaussian Splatting for Efficient 3D Mesh Reconstruction and High-Quality Mesh Rendering", arxiv:"2311.12775", year:2023, group:"École des Ponts ParisTech · LIGM", venue:"CVPR 2024",
+   zh:"用正则项让高斯贴合物体表面，从 3DGS 数分钟内抽取可编辑网格并把高斯绑定到网格上。",
+   impact:"补齐 3DGS 几何精度短板，打通高斯 splatting 与传统网格/动画管线的桥接。", proj:"https://anttwo.github.io/sugar/"},
+  {id:"g2d", cat:"rep", title:"2D Gaussian Splatting for Geometrically Accurate Radiance Fields", arxiv:"2403.17888", year:2024, group:"HKU + University of Tübingen", venue:"SIGGRAPH 2024 (ACM TOG)",
+   zh:"把 3D 高斯压成带法向的 2D 定向平面高斯，配合深度畸变与法向一致性约束实现精准表面重建。",
+   impact:"系统解决 3DGS 表面几何噪声问题，成为高斯表面重建的标准基线之一。", proj:"https://surfsplatting.github.io/"},
+
+  /* ---------- 前馈几何 ---------- */
+  {id:"dust3r", cat:"ff", title:"DUSt3R: Geometric 3D Vision Made Easy", arxiv:"2312.14132", year:2023, group:"Naver Labs Europe", venue:"CVPR 2024 · Best Paper Honorable Mention",
+   zh:"把 3D 重建变成点图（pointmap）回归的序列到序列问题，无需标定或已知位姿即可从任意照片重建。",
+   impact:"用前馈 Transformer 统一多视角几何任务，开启点图/几何大模型的整个技术路线。", proj:"https://github.com/naver/dust3r"},
+  {id:"mast3r", cat:"ff", title:"Grounding Image Matching in 3D with MASt3R", arxiv:"2406.09756", year:2024, group:"Naver Labs Europe", venue:"ECCV 2024",
+   zh:"在 DUSt3R 之上加匹配头与信息几何损失，粗到细实现 3D 感知的稠密图像匹配。",
+   impact:"把图像匹配重新定义为 3D 重建的副产品，显著刷新 SfM/定位等下游基准。", proj:"https://github.com/naver/mast3r"},
+  {id:"spann3r", cat:"ff", title:"3D Reconstruction with Spatial Memory", arxiv:"2408.16061", year:2024, group:"UCL", venue:"3DV 2025",
+   zh:"在 DUSt3R 上加 Transformer 空间记忆，用查询-更新记忆的方式做增量式序列重建。",
+   impact:"首次把点图前馈重建做成可扩展的在线/流式形式，启发后续一切状态化 3D 模型。", proj:"https://hengyiwang.github.io/Spann3R/"},
+  {id:"monst3r", cat:"ff", title:"MonST3R: A Simple Approach for Estimating Geometry in the Presence of Motion", arxiv:"2410.03825", year:2024, group:"UC Berkeley + Google DeepMind", venue:"ICLR 2025",
+   zh:"把动态视频的每帧几何表示为点云，微调 DUSt3R 在单次前向中估计动态场景几何与相机位姿。",
+   impact:"把点图路线推广到动态视频，为 4D 重建与视频深度估计建立新范式。", proj:"https://monst3r-project.github.io/"},
+  {id:"cut3r", cat:"ff", title:"Continuous 3D Perception Model with Persistent State (CUT3R)", arxiv:"2501.12387", year:2025, group:"UC Berkeley + Google DeepMind", venue:"CVPR 2025 Oral",
+   zh:"用持续滚动的内部状态处理图像流，在线输出度量尺度点图并支持任意时刻交互查询。",
+   impact:"统一在线 3D 感知框架，让流式输入下的位姿/深度/重建在单一模型内完成。", proj:"https://cut3r.github.io/"},
+  {id:"vggt", cat:"ff", title:"VGGT: Visual Geometry Grounded Transformer", arxiv:"2503.11651", year:2025, group:"Oxford VGG + Meta", venue:"CVPR 2025 · Best Paper",
+   zh:"前馈 Transformer 直接从一至数百张图像推断相机参数、深度、点图与 3D 点轨迹，秒级替代 COLMAP。",
+   impact:"CVPR 2025 最佳论文，确立 3D 视觉基础模型地位，成为多视角几何的新通用底座。", proj:"https://vgg-t.github.io/"},
+  {id:"pi3", cat:"ff", title:"π³: Permutation-Equivariant Visual Geometry Learning", arxiv:"2507.13347", year:2025, group:"Shanghai AI Lab + ZJU + SII", venue:"ICLR 2026",
+   zh:"完全置换等变架构去掉参考视角偏置，无参考帧即可预测仿射不变位姿与尺度不变局部点图。",
+   impact:"指出并修复 VGGT 式参考帧范式的尺度/参考偏置，显著提升无参考重建鲁棒性。", proj:"https://yyfz.github.io/pi3/"},
+  {id:"mapanything", cat:"ff", title:"MapAnything: Universal Feed-Forward Metric 3D Reconstruction", arxiv:"2509.13414", year:2025, group:"Meta + CMU", venue:"3DV 2026",
+   zh:"统一 Transformer 前馈模型，融合图像、内参、位姿、深度等多模态输入直接回归度量 3D 几何。",
+   impact:"把点图路线推到度量尺度与多输入条件化，18 项基准对标 VGGT/MASt3R 等专用模型。", proj:"https://map-anything.github.io/"},
+  {id:"fastvggt", cat:"ff", title:"FastVGGT: Training-Free Acceleration of Visual Geometry Transformer", arxiv:"2509.02560", year:2025, group:"Xiamen University · Media Analytics & Computing Lab", venue:null,
+   zh:"发现 VGGT 的 token 可扩展性规律，用免训练 token 合并实现 4× 加速并抑制误差累积。",
+   impact:"代表 VGGT 效率化跟进方向，让几何大模型可扩展到上千张输入图像。", proj:"https://mystorm16.github.io/fastvggt/"},
+
+  /* ---------- 世界模型 ---------- */
+  {id:"worldmodels", cat:"wm", title:"World Models", arxiv:"1803.10122", year:2018, group:"Google Brain / IDSIA · Ha & Schmidhuber", venue:"NeurIPS 2018",
+   zh:"VAE 视觉模型 + MDN-RNN 记忆模型 + 线性控制器的 V-M-C 架构，让智能体在自己生成的“梦境”中训练策略。",
+   impact:"世界模型方向的奠基之作，Dreamer、Genie 等后续工作均以“在想象中学习”为起点。", proj:"https://worldmodels.github.io"},
+  {id:"daydreamer", cat:"wm", title:"DayDreamer: World Models for Physical Robot Learning", arxiv:"2206.14176", year:2022, group:"UC Berkeley", venue:"CoRL 2022",
+   zh:"把 Dreamer 世界模型 RL 直接搬到真实机器人，四足仅用约 1 小时真实交互从零学会行走，无需仿真器。",
+   impact:"“在想象中训练、在现实中执行”的标志性机器人实验，证明世界模型的样本效率。", proj:"https://danijar.com/daydreamer"},
+  {id:"ijepa", cat:"wm", title:"Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture", arxiv:"2301.08243", year:2023, group:"Meta AI (FAIR)", venue:"ICCV 2023",
+   zh:"在嵌入空间而非像素空间预测被遮挡图像块的目标表征，无需手工数据增强即可学到高语义表征。",
+   impact:"Yann LeCun JEPA 愿景的首个落地实现，为 V-JEPA / V-JEPA 2 视频世界模型奠定架构基础。", proj:"https://ai.meta.com/blog/yann-lecun-ai-model-i-jepa/"},
+  {id:"dreamerv3", cat:"wm", title:"Mastering Diverse Domains through World Models (DreamerV3)", arxiv:"2301.04104", year:2023, group:"University of Toronto + Google DeepMind", venue:"Nature 2025",
+   zh:"一套固定超参数的世界模型智能体在 150+ 任务上超越专用方法，首个从零在 Minecraft 采集到钻石的算法。",
+   impact:"首个登上 Nature 的通用世界模型 RL 算法，确立世界模型作为通用智能体基座的方向。", proj:"https://danijar.com/project/dreamerv3"},
+  {id:"gaia1", cat:"wm", title:"GAIA-1: A Generative World Model for Autonomous Driving", arxiv:"2309.17080", year:2023, group:"Wayve", venue:"Tech Report 2023",
+   zh:"视频、文本、动作统一为 token 序列，9B 自回归 Transformer + 视频扩散解码器生成可控真实感驾驶场景。",
+   impact:"自动驾驶“世界模型”浪潮的开端，直接催生 GAIA-2、Vista 等后续工作。", proj:null},
+  {id:"unisim", cat:"wm", title:"Learning Interactive Real-World Simulators (UniSim)", arxiv:"2310.06114", year:2023, group:"UC Berkeley + Google DeepMind", venue:"ICLR 2024 Oral",
+   zh:"把机器人操作、驾驶、导航等异构数据统一为“动作可控的视频预测”，训练可交互的通用真实世界模拟器。",
+   impact:"“视频即仿真器”路线代表作：在其内部训练的策略可迁移到真实世界。", proj:"https://universal-simulator.github.io/unisim/"},
+  {id:"sora", cat:"wm", title:"Video Generation Models as World Simulators (Sora)", arxiv:null, year:2024, group:"OpenAI", venue:"Tech Report 2024",
+   zh:"提出把大规模视频生成模型视为“世界模拟器”，扩散 Transformer 在时空 patch 上扩展后涌现 3D 一致性等仿真能力。",
+   impact:"把“视频生成 = 世界模型”变成整个行业的核心叙事，引爆 2024–2025 研究热潮。", proj:"https://openai.com/index/video-generation-models-as-world-simulators/"},
+  {id:"genie", cat:"wm", title:"Genie: Generative Interactive Environments", arxiv:"2402.15391", year:2024, group:"Google DeepMind + UBC", venue:"ICML 2024 · Best Paper",
+   zh:"从无标注互联网视频无监督学习“潜在动作”模型，把任意单张图片变成可玩、可交互的生成式环境。",
+   impact:"首个基础世界模型 / 生成式交互环境，获 ICML 2024 最佳论文奖，开创基座世界模型方向。", proj:"https://deepmind.google/discover/blog/genie-ai-model-creates-interactive-worlds-from-a-single-image/"},
+  {id:"vista", cat:"wm", title:"Vista: A Generalizable Driving World Model with High Fidelity and Versatile Controllability", arxiv:"2405.17398", year:2024, group:"OpenDriveLab", venue:"NeurIPS 2024",
+   zh:"10B 参数通用驾驶世界模型，支持高分辨率长时序生成与动作、轨迹、语言等多模态可控。",
+   impact:"开源驾驶世界模型标杆，把世界模型从“数据合成器”推向“驾驶智能体通用底座”。", proj:"https://github.com/OpenDriveLab/Vista"},
+  {id:"genie2", cat:"wm", title:"Genie 2: A Large-Scale Foundation World Model", arxiv:null, year:2024, group:"Google DeepMind", venue:"DeepMind Blog 2024",
+   zh:"可将单张图片变成可用键鼠游玩、能训练和评测具身智能体的长时序 3D 交互环境。",
+   impact:"基座世界模型的规模跃升，确立“用无限生成的可玩环境训练与评测智能体”的路线。", proj:"https://deepmind.google/discover/blog/genie-2-a-large-scale-foundation-world-model/"},
+  {id:"nwm", cat:"wm", title:"Navigation World Models (NWM)", arxiv:"2412.03572", year:2024, group:"Meta FAIR + UC Berkeley", venue:"CVPR 2025 · Best Paper Honorable Mention",
+   zh:"基于 CDiT 的视频扩散世界模型，根据历史画面与导航动作预测未来观测，可在新环境中凭想象规划轨迹。",
+   impact:"视频世界模型首次在真实导航任务实现“想象-规划”闭环，打通生成模型与具身导航的边界。", proj:"https://amirbar.net/nwm/"},
+  {id:"cosmos", cat:"wm", title:"Cosmos: World Foundation Model Platform for Physical AI", arxiv:"2501.03575", year:2025, group:"NVIDIA", venue:"Tech Report 2025 · CES 发布",
+   zh:"面向物理 AI 的开放世界基座模型（WFM）平台：预训练 WFM、视频 tokenizer 与安全护栏，覆盖预测/迁移/推理三类并开源。",
+   impact:"把“世界模型作为物理 AI 基础设施”工程化并大规模开源，机器人与自驾领域影响最大的开源世界模型家族之一。", proj:"https://github.com/NVIDIA/Cosmos"},
+  {id:"vjepa2", cat:"wm", title:"V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning", arxiv:"2506.09985", year:2025, group:"Meta AI (FAIR)", venue:"arXiv 2025",
+   zh:"100 万+小时视频上自监督预训练的 12 亿参数视频世界模型，动作条件版 V-JEPA 2-AC 在未知环境零样本规划机器人抓放。",
+   impact:"证明“在表征空间预测而非重建像素”的世界模型能低成本理解、预测并规划物理世界。", proj:"https://ai.meta.com/blog/vjepa-2-world-model-benchmarks-integrations"},
+  {id:"genie3", cat:"wm", title:"Genie 3: A New Frontier for World Models", arxiv:null, year:2025, group:"Google DeepMind", venue:"DeepMind Blog 2025",
+   zh:"从文本提示实时生成 24fps、720p、可连续交互导航数分钟且视觉一致的多样化环境。",
+   impact:"首次实现“实时 + 长时序一致 + 可交互”的通用世界生成，定位为通往 AGI 的世界模型前沿。", proj:"https://deepmind.google/discover/blog/genie-3-a-new-frontier-for-world-models/"}
+];
+
+/* ===================== rendering ===================== */
+const $ = s => document.querySelector(s);
+const dark = () => {
+  const forced = document.documentElement.dataset.theme;
+  if (forced) return forced === "dark";
+  return matchMedia("(prefers-color-scheme: dark)").matches;
+};
+const catHex = c => dark() ? CATS[c].hexDark : CATS[c].hex;
+const arxivUrl = a => a ? `https://arxiv.org/abs/${a}` : null;
+
+/* --- paper cards --- */
+function cardHTML(p){
+  const venue = p.venue || "arXiv preprint " + p.year;
+  const links = [];
+  if (p.arxiv) links.push(`<a href="${arxivUrl(p.arxiv)}" target="_blank" rel="noopener">arXiv ${p.arxiv}</a>`);
+  if (p.proj)  links.push(`<a href="${p.proj}" target="_blank" rel="noopener">项目主页 ↗</a>`);
+  return `<article class="card" data-cat="${p.cat}" data-text="${(p.title+' '+p.group+' '+(p.arxiv||'')+' '+p.zh+' '+p.impact).toLowerCase()}">
+    <div class="row1"><span class="venue" style="color:${catHex(p.cat)}">${venue}</span><span class="yr">${p.year}</span></div>
+    <h3 class="serif">${p.arxiv ? `<a href="${arxivUrl(p.arxiv)}" target="_blank" rel="noopener">${p.title}</a>` : p.title}</h3>
+    <p class="group">${p.group}</p>
+    <p class="zh">${p.zh}</p>
+    <p class="impact">${p.impact}</p>
+    <div class="links">${links.join('')}</div>
+  </article>`;
+}
+function renderSections(){
+  $("#sections").innerHTML = Object.entries(CATS).map(([id,c]) =>
+    `<section class="paper-sec" id="sec-${id}">
+      <div class="sec-head"><p class="sec-kicker">${c.name}</p></div>
+      <p class="sec-intro">${c.intro}</p>
+      <div class="cards" id="cards-${id}"></div>
+    </section>`).join('');
+  for (const id of Object.keys(CATS))
+    $("#cards-"+id).innerHTML = PAPERS.filter(p=>p.cat===id).map(cardHTML).join('');
+}
+
+/* --- lineage map --- */
+const LANE_Y = {slam:96, rep:206, ff:316, wm:426};
+const SUB = {0:-16, 1:18};
+const N = [ // id,label,cat,year,sub,side(r|l),star?
+  ["orbslam3","ORB-SLAM3","slam",2021,0,"l"],["droid","DROID-SLAM","slam",2021,1,"r"],
+  ["fastlio2","FAST-LIO2","slam",2022,0,"r"],["nice","NICE-SLAM","slam",2022,0,"l"],["r3live","R3LIVE","slam",2022,1,"r"],
+  ["goslam","GO-SLAM","slam",2023,0,"r"],["pslam","Point-SLAM","slam",2023,1,"r"],
+  ["splatam","SplaTAM","slam",2024,0,"r"],["monogs","MonoGS","slam",2024,0,"l"],["fastlivo2","FAST-LIVO2","slam",2024,1,"r"],
+  ["mast3rslam","MASt3R-SLAM","slam",2025,0,"r"],
+  ["nerf","NeRF","rep",2020,1,"r"],["ingp","Instant-NGP","rep",2022,0,"r"],
+  ["g3d","3DGS","rep",2023,0,"r",true],["sugar","SuGaR","rep",2024,1,"r"],["g2d","2DGS","rep",2024,0,"l"],
+  ["dust3r","DUSt3R","ff",2023,0,"r",true],["mast3r","MASt3R","ff",2024,0,"r"],
+  ["spann3r","Spann3R","ff",2024,1,"r"],["monst3r","MonST3R","ff",2024,1,"l"],
+  ["cut3r","CUT3R","ff",2025,0,"l"],["vggt","VGGT","ff",2025,1,"r",true],
+  ["pi3","π³","ff",2025,1,"l"],["mapanything","MapAnything","ff",2025,0,"r"],
+  ["worldmodels","World Models","wm",2018,0,"r",true],["daydreamer","DayDreamer","wm",2022,1,"r"],
+  ["dreamerv3","DreamerV3","wm",2023,0,"r"],["ijepa","I-JEPA","wm",2023,1,"r"],["gaia1","GAIA-1","wm",2023,0,"l"],
+  ["sora","Sora","wm",2024,0,"r"],["genie","Genie","wm",2024,1,"r"],["vista","Vista","wm",2024,0,"l"],
+  ["nwm","NWM","wm",2024,1,"l"],["genie3","Genie 3","wm",2025,0,"r"],["cosmos","Cosmos","wm",2025,0,"l"],["vjepa2","V-JEPA 2","wm",2025,1,"r"]
+].map(([id,label,cat,year,sub,side,star]) => ({id,label,cat,year,sub,side,star,
+  x: 64 + (year-2018)*116, y: LANE_Y[cat] + SUB[sub]}));
+
+const E = [ // from,to,dashed?
+  ["droid","goslam",0],["nice","pslam",0],["pslam","splatam",0],["splatam","monogs",0],
+  ["fastlio2","r3live",0],["r3live","fastlivo2",0],
+  ["nerf","g3d",1],["ingp","g3d",1],["g3d","g2d",0],["g3d","sugar",0],
+  ["dust3r","mast3r",0],["dust3r","spann3r",0],["mast3r","mast3rslam",0,"bridge"],
+  ["spann3r","cut3r",0],["dust3r","vggt",1],["vggt","pi3",0],["vggt","mapanything",0],
+  ["worldmodels","dreamerv3",1],["ijepa","vjepa2",0],["gaia1","vista",0],["vista","cosmos",1],
+  ["sora","genie",1],["genie","genie3",1],
+  ["g3d","splatam",0,"bridge"],["vggt","cosmos",1,"bridge"]
+];
+
+function nodePos(id){ const n = N.find(n=>n.id===id); const dx = n.side==="r" ? 10 : -10; const anchor = n.side==="r" ? "start" : "end"; return {n, dx, anchor}; }
+
+function renderLineage(){
+  const svg = $("#lineageSvg");
+  const css = getComputedStyle(document.documentElement);
+  const t = k => css.getPropertyValue(k).trim();
+  const parts = [];
+
+  // year axis + grid
+  for (let y=2018; y<=2026; y++){
+    const x = 64 + (y-2018)*116;
+    parts.push(`<line x1="${x}" y1="52" x2="${x}" y2="452" stroke="${t('--line-soft')}" stroke-width="1"/>`);
+    parts.push(`<text x="${x}" y="34" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="${t('--ink-3')}">${y}</text>`);
+  }
+  // lane rails
+  for (const [cat,ly] of Object.entries(LANE_Y)){
+    parts.push(`<line x1="40" y1="${ly}" x2="1090" y2="${ly}" stroke="${t('--line')}" stroke-width="1" stroke-dasharray="2 4"/>`);
+    const cn = CATS[cat].name.split("（")[0];
+    parts.push(`<text x="40" y="${ly-26}" font-family="IBM Plex Mono" font-size="10.5" letter-spacing="2" fill="${t('--ink-3')}">${{slam:"SLAM",rep:"3D REPRESENTATION",ff:"FEED-FORWARD GEOMETRY",wm:"WORLD MODELS"}[cat]}</text>`);
+  }
+
+  // edges
+  for (const [from,to,dash,tag] of E){
+    const a = nodePos(from), b = nodePos(to);
+    const x1 = a.n.x + (a.n.side==="r" ? 6 : -6), y1 = a.n.y;
+    const x2 = b.n.x + (b.n.side==="r" ? -6 : 6), y2 = b.n.y;
+    const mx = (x1+x2)/2;
+    const path = a.n.cat===b.n.cat && Math.abs(y1-y2)<4
+      ? `M${x1} ${y1} L${x2} ${y2}`
+      : `M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    const col = t(tag==="bridge" ? "--accent" : "--line");
+    const w = tag==="bridge" ? 1.6 : 1;
+    parts.push(`<path d="${path}" fill="none" stroke="${col}" stroke-width="${w}" ${dash?'stroke-dasharray="4 4"':""} opacity="${tag==="bridge"?0.9:0.85}"/>`);
+    if (tag==="bridge"){
+      const bl = {["mast3r>mast3rslam"]:["重建先验驱动 SLAM",38,-18,"start"],
+                  ["g3d>splatam"]:["高斯即地图",0,-6,"middle"],
+                  ["vggt>cosmos"]:["几何先验 ⇄ 生成先验",0,-6,"middle"]}[from+">"+to];
+      if (bl) parts.push(`<text x="${mx+bl[1]}" y="${(y1+y2)/2 + bl[2]}" text-anchor="${bl[3]}" font-family="IBM Plex Mono" font-size="10.5" fill="${t('--accent')}">${bl[0]}</text>`);
+    }
+  }
+
+  // nodes
+  for (const n of N){
+    const {dx, anchor} = nodePos(n.id);
+    const c = catHex(n.cat);
+    parts.push(`<circle cx="${n.x}" cy="${n.y}" r="${n.star?5.5:4}" fill="${c}" ${n.star?`stroke="${t('--accent')}" stroke-width="2"`:""}/>`);
+    parts.push(`<text x="${n.x+dx}" y="${n.y+3.5}" text-anchor="${anchor}" font-family="IBM Plex Mono" font-size="${n.star?11:10}" font-weight="${n.star?600:400}" fill="${n.star ? t('--ink') : t('--ink-2')}">${n.label}</text>`);
+  }
+  // legend
+  parts.push(`<g font-family="IBM Plex Mono" font-size="10" fill="${t('--ink-3')}">
+    <line x1="880" y1="16" x2="912" y2="16" stroke="${t('--line')}" stroke-width="1.4"/>
+    <text x="918" y="19.5">直接延伸</text>
+    <line x1="990" y1="16" x2="1022" y2="16" stroke="${t('--line')}" stroke-width="1.4" stroke-dasharray="4 4"/>
+    <text x="1028" y="19.5">思想影响</text></g>`);
+  svg.innerHTML = parts.join("");
+}
+
+/* --- filtering --- */
+let curCat = "all";
+function applyFilter(){
+  const q = $("#q").value.trim().toLowerCase();
+  let visible = 0;
+  for (const id of Object.keys(CATS)){
+    let secCount = 0;
+    document.querySelectorAll(`#cards-${id} .card`).forEach(card => {
+      const ok = (curCat==="all" || curCat===id) && (!q || card.dataset.text.includes(q));
+      card.style.display = ok ? "" : "none";
+      if (ok){ secCount++; visible++; }
+    });
+    document.getElementById("sec-"+id).style.display = secCount ? "" : "none";
+  }
+  $("#emptyMsg").style.display = visible ? "none" : "block";
+  $("#count").textContent = `${visible} / ${PAPERS.length}`;
+}
+document.querySelectorAll(".chip").forEach(ch => ch.addEventListener("click", () => {
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+  ch.classList.add("on"); curCat = ch.dataset.cat; applyFilter();
+}));
+$("#q").addEventListener("input", applyFilter);
+
+/* --- theme toggle --- */
+const btn = $("#themeBtn");
+function setTheme(mode){ // null = follow system
+  if (mode) document.documentElement.dataset.theme = mode;
+  else delete document.documentElement.dataset.theme;
+  try{ localStorage.setItem("atlas-theme", mode || ""); }catch(e){}
+  renderLineage();
+}
+btn.addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  setTheme(cur === "dark" ? "light" : "dark");
+});
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem("atlas-theme"); }catch(e){}
+  if (saved) document.documentElement.dataset.theme = saved;
+})();
+
+/* --- boot --- */
+$("#statTotal").textContent = PAPERS.length;
+renderSections();
+renderLineage();
+applyFilter();
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", renderLineage);
+</script>
+</body>
+</html>
