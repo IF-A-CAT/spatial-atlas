@@ -10,6 +10,9 @@ on:
 
 permissions:
   contents: write
+  # GitHub Models 用内置 GITHUB_TOKEN 调用需要 models: read，否则摘要请求一律 401，
+  # 而脚本会吞掉异常回退英文摘要 —— 表现为"新论文一直没有中文摘要"这种静默降级。
+  models: read
 
 concurrency:
   group: daily-papers

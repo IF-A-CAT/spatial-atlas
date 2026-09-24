@@ -1,10 +1,18 @@
 name: deploy-pages
 
-# push 到 main（含 daily-papers 机器人的提交）即自动部署静态站点到 GitHub Pages。
-# 首次运行时 configure-pages 的 enablement 会用内置 GITHUB_TOKEN 自动开通 Pages，
-# 无需手动到 Settings → Pages 里切换。
+# 部署静态站点到 GitHub Pages。首次运行时 configure-pages 的 enablement 会用内置
+# GITHUB_TOKEN 自动开通 Pages，无需手动到 Settings → Pages 里切换。
+#
+# 为什么需要 workflow_run：daily-papers 用内置 GITHUB_TOKEN 提交推送，而 GitHub 规定
+# GITHUB_TOKEN 产生的 push 事件不会触发其他 workflow（例外仅 workflow_dispatch /
+# repository_dispatch）。只挂 push 的话机器人提交永远不会重新部署 —— 站点会静默变旧。
+# 因此额外监听 daily-papers 完成事件；push 保留，覆盖人手动推送的情况。
 on:
   push:
+    branches: [main]
+  workflow_run:
+    workflows: ["daily-papers"]
+    types: [completed]
     branches: [main]
   workflow_dispatch: {}
 
@@ -19,12 +27,18 @@ concurrency:
 
 jobs:
   deploy:
+    # workflow_run 在失败时也会触发；只有 daily-papers 成功才部署（失败时没新内容）。
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # 显式取 main：workflow_run 的默认 ref 是 daily-papers 那次运行所用的提交，
+      # 即机器人提交之前的那个 SHA，checkout 会拿到旧文件。
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Collect site files
         run: mkdir -p _site && cp index.html daily.js .nojekyll _site/
